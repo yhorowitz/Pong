@@ -71,25 +71,26 @@ public class Pong extends JFrame
 	
 	Timer compPaddleTimer = new Timer(5, new ComputerPaddleListener());
 	
-	public synchronized void setBallXPos(int pos){ this.ballXPos  = pos; }
-	public synchronized int getBallXPos(){ return ballXPos; }
-	public synchronized void setBallYPos(int pos){ this.ballYPos  = pos; }
-	public synchronized int getBallYPos(){ return ballYPos; }
+	public void setBallXPos(int pos){ this.ballXPos  = pos; }
+	public int getBallXPos(){ return ballXPos; }
+	public void setBallYPos(int pos){ this.ballYPos  = pos; }
+	public int getBallYPos(){ return ballYPos; }
 
-	public synchronized void setPlayerPaddleXPos(int pos){ this.playerPaddleXPos = pos; }
-	public synchronized int getPlayerPaddleXPos(){ return playerPaddleXPos; }
-	public synchronized void setPlayerPaddleYPos(int pos){ this.playerPaddleYPos = pos; }
-	public synchronized int getPlayerPaddleYPos(){ return playerPaddleYPos; }
+	public void setPlayerPaddleXPos(int pos){ this.playerPaddleXPos = pos; }
+	public int getPlayerPaddleXPos(){ return playerPaddleXPos; }
+	public void setPlayerPaddleYPos(int pos){ this.playerPaddleYPos = pos; }
+	public int getPlayerPaddleYPos(){ return playerPaddleYPos; }
 	
-	public synchronized void setCompPaddleXPos(int pos){ this.compPaddleXPos = pos; }
-	public synchronized int getCompPaddleXPos(){ return compPaddleXPos; }
-	public synchronized void setCompPaddleYPos(int pos){ this.compPaddleYPos = pos; }
-	public synchronized int getCompPaddleYPos(){ return compPaddleYPos; }
+	public void setCompPaddleXPos(int pos){ this.compPaddleXPos = pos; }
+	public int getCompPaddleXPos(){ return compPaddleXPos; }
+	public void setCompPaddleYPos(int pos){ this.compPaddleYPos = pos; }
+	public int getCompPaddleYPos(){ return compPaddleYPos; }
 
 		
 	public static void main(String args[])
 	{
 		new Pong();
+		
 	}
 	
 	Pong()
@@ -198,8 +199,14 @@ public class Pong extends JFrame
 			setBallYPos(getBallYPos() + ballYIncrementer);
 			
 			//if it hits left paddle
-			if (getBallXPos() <= widthBuffer + paddleWidth && getBallXPos() > widthBuffer && getBallYPos() >= getPlayerPaddleYPos() && getBallYPos() <= getPlayerPaddleYPos() + paddleHeight)
+			if (getBallXPos() <= getPlayerPaddleXPos() + paddleWidth - 2 && getBallXPos() > getPlayerPaddleXPos() 
+					&& getBallYPos() >= getPlayerPaddleYPos() && getBallYPos() <= getPlayerPaddleYPos() + paddleHeight)
 			{
+//				System.out.println("hit left");
+//				System.out.println("Low bound: " + getPlayerPaddleXPos());
+//				System.out.println("High bound: " + (getPlayerPaddleXPos() + paddleWidth - 2));
+//				System.out.println("Actual position: " + getBallXPos());
+
 				if (Math.abs(ballXIncrementer) > MIN_BALL_SPEED && Math.abs(ballXIncrementer) < MAX_BALL_SPEED)	//set speed min and max
 					ballXIncrementer = (rand.nextInt(3) - 1) + (ballXIncrementer * -1);	
 				else if (Math.abs(ballXIncrementer) >= MAX_BALL_SPEED)
@@ -210,10 +217,18 @@ public class Pong extends JFrame
 				setBallXPos(getBallXPos() + 2);
 			}
 			
+			
 			//if it hits right paddle
-			if (getBallXPos() >= mainPanel.getWidth() - widthBuffer - paddleWidth - MAX_BALL_SPEED && getBallXPos() < PANEL_WIDTH - widthBuffer - paddleWidth + ballXIncrementer && getBallYPos() >= getCompPaddleYPos() && getBallYPos() <= getCompPaddleYPos() + paddleHeight)
+			if (getBallXPos() >= getCompPaddleXPos() - ballSize + 2 && getBallXPos() < getCompPaddleXPos() + paddleWidth - ballSize /*+ ballXIncrementer*/ 
+					/*the +1 fixes an issue where it appears as if it is going through the computers paddle*/
+					&& getBallYPos() + 1 >= getCompPaddleYPos() && getBallYPos() <= getCompPaddleYPos() + paddleHeight)
 			{
-				if (Math.abs(ballXIncrementer) > MIN_BALL_SPEED && Math.abs(ballXIncrementer) < 8)	//set speed min and max
+//				System.out.println("hit right");
+//				System.out.println("Low bound: " + (getCompPaddleXPos() - ballSize));
+//				System.out.println("High bound: " + (getCompPaddleXPos() + paddleWidth - ballSize + 2));
+//				System.out.println("Actual position: " + getBallXPos());
+
+				if (Math.abs(ballXIncrementer) > MIN_BALL_SPEED && Math.abs(ballXIncrementer) < MAX_BALL_SPEED)	//set speed min and max
 					ballXIncrementer = (rand.nextInt(3) - 1) + (ballXIncrementer * -1);
 				else if (Math.abs(ballXIncrementer) >= MAX_BALL_SPEED)
 					ballXIncrementer = (ballXIncrementer * -1) + 2; //decrease the speed
@@ -222,6 +237,20 @@ public class Pong extends JFrame
 				
 				setBallXPos(getBallXPos() - 2);
 			}
+			
+//			FOR TESTING BUG THAT MAKES IT APPEAR THE BALL IS GOING THROUGH THE COMPUTERS PADDLE			
+//			if (getBallXPos() >=745) {
+//				System.out.println("_________________________________________________________");
+//				System.out.println("ball pos: " + getBallXPos());
+//				System.out.println("ball y pos: " + getBallYPos());
+//				System.out.println("paddle y pos: " + getCompPaddleYPos());
+//				System.out.println("through lower x bound(" +(getCompPaddleXPos() - ballSize + 2 )+ "): " + (getBallXPos() >= getCompPaddleXPos() - ballSize + 2 ));
+//				System.out.println("within upper x bound(" +(getCompPaddleXPos() + paddleWidth - ballSize) + "): " + (getBallXPos() < getCompPaddleXPos() + paddleWidth - ballSize));
+//				System.out.println("through lower y bound(" +(getCompPaddleYPos() )+ "): " + (getBallYPos() >= getCompPaddleYPos() ));
+//				System.out.println("within upper y bound(" +(getBallYPos() <= getCompPaddleYPos() + paddleHeight) + "): " + (getBallYPos() <= getCompPaddleYPos() + paddleHeight));
+//				System.out.println("_________________________________________________________");
+//				System.out.println();
+//			}
 			
 			//if hits the top
 			if (getBallYPos() <= 0)
